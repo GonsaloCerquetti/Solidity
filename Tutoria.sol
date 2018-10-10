@@ -8,6 +8,9 @@ contract Tutoria {
     constructor (string mat, address prof) public{
         materia = mat;
         alumno = msg.sender;
+        require(msg.sender != prof);
+        profesor = prof;
+        
     }
     
     function getMateria() public returns (string) {
@@ -21,6 +24,5 @@ contract Tutoria {
     function getAlumno() public returns (address) {
         return alumno;
     }
-    
     
 }
