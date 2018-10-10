@@ -4,12 +4,14 @@ contract Tutoria {
     string materia;
     address profesor;
     address alumno;
+    uint confi = 0;
     
     constructor (string mat, address prof) public{
         materia = mat;
         alumno = msg.sender;
         require(msg.sender != prof);
         profesor = prof;
+       
         
     }
     
@@ -25,4 +27,12 @@ contract Tutoria {
         return alumno;
     }
     
+    function confirmar() public returns (uint){
+        return confi=1;
+    }
+    
+    function confirmado() public returns (uint){
+        require(confi==1);
+        return confi;
+    }
 }
