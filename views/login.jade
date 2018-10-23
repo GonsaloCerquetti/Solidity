@@ -1,0 +1,27 @@
+html
+  head
+    
+
+    meta(charset='UTF-8')
+    // Import Google Icon Font
+    link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+
+    title Login
+
+    link(rel="stylesheet", href='/css/formulario.css')
+    
+    link(rel='stylesheet', href="/css/normalize.css")
+    
+  body
+    div(style='margin:100px;')
+      form(method='POST', action='login/respuesta')
+        h2 Usuario:
+        br
+        select#usuario(name='usuario')
+          option(value='1') Alumno
+          option(value='2') Profesor
+          
+        br
+        br
+        input(type='submit', value='Entrar')
