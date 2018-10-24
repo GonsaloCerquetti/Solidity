@@ -14,39 +14,7 @@ router.get('/login', function (req, res, next) {
   res.render('login', {});
 });
 
-
-//Login alumno
-router.post('/login/login/respuesta2', function (req, res, next) {
-  global.usuario = req.body.usuario;
-  global.materia = req.body.materia;
-  global.profesor = req.body.profesor;
-  console.log(usuario, materia, profesor)
-  //console.log(app.abi)
-  //console.log(app.byte)
-  global.myContract = new web3.eth.Contract(app.abi, '0xa5877e9ce8fb5e87340bab7d6305e23538f1a125', { data: app.byte, gasPrice: '20000000000' }); //address del contrato
-  myContract.methods.solicitar(profesor, materia).send({ from: usuario, gas: 200000 })
-  res.render('respuesta', {});
-});
-
-//profesor
-router.post('/login/login/respuesta3', function (req, res, next) {
-  global.usuario = req.body.usuario;
-  global.profesor = req.body.profesor;
-  console.log(usuario, materia, profesor)
-
-  myContract.methods.confirmar(usuario).send({ from: profesor, gas: 200000 })
-  myContract.methods.estaConfirmado(usuario).call().then(e => {
-
-        var respuesta = 'estaConfirmado(): ';
-        for (let index = 0; index < e.length; index++) {
-          const a = e[index];
-          respuesta += a.toString();
-        }
-        res.send(respuesta);
-      });
-
-});
-
+//Login Inicial
 router.post("/login/respuesta", function (req, res, next) {
   global.usuario = req.body.usuario;
 
@@ -62,6 +30,82 @@ router.post("/login/respuesta", function (req, res, next) {
 
   }
 });
+
+
+//Login alumno
+router.post('/login/login/respuesta2', function (req, res, next) {
+  let metodo= req.body.metodo
+
+  switch (metodo) {
+    case "1":
+      res.render('solicitar', {});
+      
+      break;
+    case "2":
+      res.render('cancelar', {});
+      
+      break;
+  }
+
+  res.render('respuesta', {});
+});
+
+
+router.post('/login/login/login/respuesta5', function (req, res, next) {
+  global.usuario = req.body.usuario;
+  global.materia = req.body.materia;
+  global.profesor = req.body.profesor;
+  console.log(usuario, materia, profesor)
+  console.log('---------------------------------------------------------------------')
+  //console.log(app.abi)
+  //console.log(app.byte)
+  global.myContract = new web3.eth.Contract(app.abi, '0xa5877e9ce8fb5e87340bab7d6305e23538f1a125', { data: app.byte, gasPrice: '20000000000' }); //address del contrato
+  myContract.methods.solicitar(profesor, materia).send({ from: usuario, gas: 200000 })
+  
+  myContract.methods.solicitar(profesor, materia).call({from:usuario}).then(e => {
+    console.log(e) 
+  })
+
+  res.render('respuesta', {});
+});
+
+router.post('/login/login/login/respuesta4', function (req, res, next) {
+  global.usuario = req.body.usuario;
+  global.key = req.body.key
+  console.log(usuario, materia, profesor)
+  myContract.methods.cancelar(key).send({ from: usuario, gas: 200000 })
+    myContract.methods.estaCancelado(key).call().then(e => {
+
+      var respuesta = 'estaCancelado(): ';
+      for (let index = 0; index < e.length; index++) {
+        const a = e[index];
+        respuesta += a.toString();
+      }
+      res.send(respuesta);
+    });
+  
+});
+
+//profesor
+router.post('/login/login/respuesta3', function (req, res, next) {
+  global.profesor = req.body.profesor;
+  global.key = req.body.key;
+  console.log(key, profesor)
+
+  myContract.methods.confirmar(key).send({ from: profesor, gas: 200000 })
+  myContract.methods.estaConfirmado(key).call().then(e => {
+
+        var respuesta = 'estaConfirmado(): ';
+        for (let index = 0; index < e.length; index++) {
+          const a = e[index];
+          respuesta += a.toString();
+        }
+        res.send(respuesta);
+      });
+
+});
+
+
 
 
 //cuentas
@@ -88,8 +132,7 @@ router.get('/accounts', function (req, res, next) {
 
 //ultimo
 router.get('/last', function (req, res, next) {
-  web3.eth.getBlockNumber()
-    .then(number => {
+  web3.eth.getBlockNumber().then(number => {
 
       res.send(number.toString());
 
@@ -107,9 +150,11 @@ router.get('/metodos', function (req, res, next) {
 
 router.post("/metodos/respuesta", function (req, res, next) {
   let metodo = req.body.metodo;
+  let key = req.body.key;
   switch (metodo) {
     case "1":
-      myContract.methods.getMateria(usuario).call().then(e => {
+      myContract.methods.getMateria(key).call()
+      .then(e => {
 
         var respuesta = 'getMateria(): ';
         for (let index = 0; index < e.length; index++) {
@@ -120,7 +165,7 @@ router.post("/metodos/respuesta", function (req, res, next) {
       });
       break;
     case "2":
-      myContract.methods.getProfesor(usuario).call().then(e => {
+      myContract.methods.getProfesor(key).call().then(e => {
 
         var respuesta = 'getProfesor(): ';
         for (let index = 0; index < e.length; index++) {
@@ -131,7 +176,7 @@ router.post("/metodos/respuesta", function (req, res, next) {
       });
       break;
     case "3":
-      myContract.methods.getAlumno(usuario).call().then(e => {
+      myContract.methods.getAlumno(key).call().then(e => {
 
         var respuesta = 'getAlumno(): ';
         for (let index = 0; index < e.length; index++) {
@@ -142,7 +187,7 @@ router.post("/metodos/respuesta", function (req, res, next) {
       });
       break;
     case "4":
-      myContract.methods.estaConfirmado(usuario).call().then(e => {
+      myContract.methods.estaConfirmado(key).call().then(e => {
 
         var respuesta = 'estaConfirmado(): ';
         for (let index = 0; index < e.length; index++) {
@@ -153,7 +198,7 @@ router.post("/metodos/respuesta", function (req, res, next) {
       });
       break;
     case "5":
-      myContract.methods.estaCancelado(usuario).call().then(e => {
+      myContract.methods.estaCancelado(key).call().then(e => {
 
         var respuesta = 'estaCancelado(): ';
         for (let index = 0; index < e.length; index++) {
@@ -164,19 +209,6 @@ router.post("/metodos/respuesta", function (req, res, next) {
 
       });
       break;
-    case "6":
-    myContract.methods.cancelar(usuario).send({ from: usuario, gas: 200000 })
-    myContract.methods.estaCancelado(usuario).call().then(e => {
-
-      var respuesta = 'estaCancelado(): ';
-      for (let index = 0; index < e.length; index++) {
-        const a = e[index];
-        respuesta += a.toString();
-      }
-      res.send(respuesta);
-    });
-    break;
-
 
   }
 
